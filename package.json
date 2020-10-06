@@ -15,7 +15,7 @@
 		"discord.js": "^12.2.0"
 	},
 	"scripts": {
-		"prepublish": "tsc"
+		"install": "tsc"
 	},
 	"devDependencies": {
 		"@types/node": "^14.0.14",
