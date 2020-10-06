@@ -25,7 +25,7 @@ export async function editMessageWithPaginatedEmbeds(
 	};
 	let page = 0;
 
-	const currentPage = await message.edit(
+	const currentPage = await message.channel.send(
 		pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))
 	);
 
