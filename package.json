@@ -1,6 +1,6 @@
 {
 	"name": "@cataclym/discord.js-pagination-ts-nsb",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "discord.js-pagination-ts for my own bot",
 	"main": "./dist/index.js",
 	"typings": "./dist/index.d.ts",
@@ -12,7 +12,6 @@
 		"registry": "https://npm.pkg.github.com/"
 	},
 	"dependencies": {
-		"discord.js": "^12.2.0"
 	},
 	"scripts": {
 		"install": "tsc"

@@ -12,11 +12,10 @@ export interface PageOptions {
 	owner: User | null;
 }
 
-export async function editMessageWithPaginatedEmbeds(
+export async function sendPaginatedMessage(
 	message: Message,
 	pages: MessageEmbed[],
-	{ emojiList, footer, owner, timeout }: Partial<PageOptions>
-) {
+	{ emojiList, footer, owner, timeout }: Partial<PageOptions>) {
 	const options: PageOptions = {
 		emojiList: emojiList ?? ['⏪', '⏩'],
 		timeout: timeout ?? 120000,
@@ -25,19 +24,25 @@ export async function editMessageWithPaginatedEmbeds(
 	};
 	let page = 0;
 
-	const currentPage = await message.channel.send(
-		pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))
+	const currentPage = await message.channel.send({
+		embeds: [pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))]
+		}
 	);
 
 	if (pages.length > 1) {
 		for (const emoji of options.emojiList) await currentPage.react(emoji);
-		const reactionCollector = currentPage.createReactionCollector(
-			(reaction, user) =>
-				options.emojiList.includes(reaction.emoji.name) &&
-				!user.bot &&
-				(options.owner ? options.owner.id === user.id : true),
-			{ time: options.timeout }
-		);
+		const reactionCollector = currentPage.createReactionCollector({
+			filter: (reaction, user) => {
+				if (reaction.emoji.name) {
+					return options.emojiList.includes(reaction.emoji.name) &&
+					!user.bot &&
+					(options.owner ? options.owner.id === user.id : true)
+				}
+				return false;
+			},
+			time: options.timeout
+		});
+
 		reactionCollector.on('collect', (reaction, user) => {
 			reaction.users.remove(user);
 			switch (reaction.emoji.name) {
@@ -50,11 +55,9 @@ export async function editMessageWithPaginatedEmbeds(
 				default:
 					break;
 			}
-			currentPage.edit(
-				pages[page].setFooter(
-					formatFooter(options.footer, page + 1, pages.length)
-				)
-			);
+			currentPage.edit({embeds:
+				[pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))]
+			});
 		});
 
 		reactionCollector.on('end', () => currentPage.reactions.removeAll());
