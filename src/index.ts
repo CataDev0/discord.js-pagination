@@ -46,13 +46,18 @@ export async function sendPaginatedMessage(
 		);
 
 		const collector = currentPage.createMessageComponentCollector({
-			filter: (i) => ["Forward", "Backward"].includes(i.customID),
+			filter: (i) => ["Forward", "Backward"].includes(i.customID) && owner
+				? owner.id === i.user.id
+				: true,
 			time: timeout,
-			dispose: true,
 		})
 
-		collector.on("collect", async (t) => {
+		collector.once("end", async () => {
+			await currentPage.edit({ components: [] })
+			collector.stop();
+		});
 
+		collector.on("collect", async (t) => {
 			await t.deferUpdate();
 			switch (t.customID) {
 				case "Backward": {
@@ -72,16 +77,6 @@ export async function sendPaginatedMessage(
 					[pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))]
 			});
 		});
-
-		collector.on("dispose" || "end", (t) => {
-			t.update({
-				components: [],
-			})
-			currentPage.edit({
-				components: [],
-			})
-			collector.stop();
-		})
 
 		return currentPage;
 	}
