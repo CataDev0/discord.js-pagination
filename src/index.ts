@@ -28,13 +28,13 @@ export async function sendPaginatedMessage(
 			new MessageButton()
 				.setCustomID("Backward")
 				.setLabel("⏪")
-				.setStyle("PRIMARY"),
+				.setStyle("SECONDARY"),
 		)
 		.addComponents(
 			new MessageButton()
 				.setCustomID("Forward")
 				.setLabel("⏩")
-				.setStyle("PRIMARY"),
+				.setStyle("SECONDARY"),
 		);
 
 	if (pages.length > 1) {
