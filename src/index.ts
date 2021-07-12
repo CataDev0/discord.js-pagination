@@ -73,11 +73,14 @@ export async function sendPaginatedMessage(
 			});
 		});
 
-		collector.on("end", () => {
-			collector.stop();
+		collector.on("dispose" || "end", (t) => {
+			t.update({
+				components: [],
+			})
 			currentPage.edit({
 				components: [],
 			})
+			collector.stop();
 		})
 
 		return currentPage;
@@ -86,7 +89,6 @@ export async function sendPaginatedMessage(
 	else {
 		return await message.channel.send({
 				embeds: [pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))],
-				components: [row],
 			}
 		);
 	}
