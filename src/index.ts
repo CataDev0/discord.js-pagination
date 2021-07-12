@@ -75,6 +75,9 @@ export async function sendPaginatedMessage(
 
 		collector.on("end", () => {
 			collector.stop();
+			currentPage.edit({
+				components: [],
+			})
 		})
 
 		return currentPage;
