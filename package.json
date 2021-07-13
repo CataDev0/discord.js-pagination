@@ -1,6 +1,6 @@
 {
 	"name": "@cataclym/discord.js-pagination-ts-nsb",
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"description": "discord.js-pagination-ts for my own bot",
 	"main": "./dist/index.js",
 	"typings": "./dist/index.d.ts",

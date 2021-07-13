@@ -23,39 +23,35 @@ export async function sendPaginatedMessage(
 		owner: owner || null,
 	};
 	let page = 0;
-	const row = new MessageActionRow()
-		.addComponents(
-			new MessageButton()
-				.setCustomID("Backward")
-				.setLabel("⏪")
-				.setStyle("SECONDARY"),
-		)
-		.addComponents(
-			new MessageButton()
-				.setCustomID("Forward")
-				.setLabel("⏩")
-				.setStyle("SECONDARY"),
-		);
 
 	if (pages.length > 1) {
 
+		timeout = timeout ?? 120000;
+
 		const currentPage = await message.channel.send({
 				embeds: [pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))],
-				components: [row],
+				components: [new MessageActionRow()
+					.addComponents(
+						new MessageButton()
+							.setCustomID("Backward")
+							.setLabel("⏪")
+							.setStyle("SECONDARY"),
+					)
+					.addComponents(
+						new MessageButton()
+							.setCustomID("Forward")
+							.setLabel("⏩")
+							.setStyle("SECONDARY"),
+					)],
 			}
 		);
 
-		const collector = currentPage.createMessageComponentCollector({
+		const collector = message.createMessageComponentCollector({
 			filter: (i) => ["Forward", "Backward"].includes(i.customID) && owner
 				? owner.id === i.user.id
 				: true,
 			time: timeout,
 		})
-
-		collector.once("end", async () => {
-			await currentPage.edit({ components: [] })
-			collector.stop();
-		});
 
 		collector.on("collect", async (t) => {
 			await t.deferUpdate();
@@ -73,9 +69,15 @@ export async function sendPaginatedMessage(
 				}
 			}
 
-			await currentPage.edit({embeds:
+			await currentPage.edit({
+				embeds:
 					[pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))]
 			});
+		});
+
+		collector.once("end", async () => {
+			await currentPage.edit({ components: [] })
+			collector.stop();
 		});
 
 		return currentPage;
@@ -83,7 +85,8 @@ export async function sendPaginatedMessage(
 
 	else {
 		return await message.channel.send({
-				embeds: [pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))],
+				embeds:
+					[pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))],
 			}
 		);
 	}
