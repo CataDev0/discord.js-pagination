@@ -46,7 +46,7 @@ export async function sendPaginatedMessage(
 			}
 		);
 
-		const collector = message.createMessageComponentCollector({
+		const collector = currentPage.createMessageComponentCollector({
 			filter: (i) => ["Forward", "Backward"].includes(i.customID) && owner
 				? owner.id === i.user.id
 				: true,
