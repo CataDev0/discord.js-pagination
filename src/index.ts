@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, User, MessageActionRow, MessageButton } from 'discord.js';
+import { Message, MessageEmbed, User, MessageActionRow, MessageButton, MessageOptions } from 'discord.js';
 
 const formatFooter = (footer: string, current: number, max: number) =>
 	footer
@@ -14,37 +14,50 @@ export interface PageOptions {
 
 export async function sendPaginatedMessage(
 	message: Message,
-	pages: MessageEmbed[],
+	pages: (MessageEmbed | MessageOptions)[],
 	{ emojiList, footer, owner, timeout }: Partial<PageOptions>) {
+
 	const options: PageOptions = {
 		emojiList: emojiList ?? ['⏪', '⏩'],
 		timeout: timeout ?? 120000,
 		footer: footer ?? 'Showing page {current} of {max}',
 		owner: owner || null,
 	};
+
 	let page = 0;
+
+	const row = [new MessageActionRow()
+		.addComponents(
+			new MessageButton()
+				.setCustomID("Backward")
+				.setLabel("⏪")
+				.setStyle("SECONDARY"),
+		)
+		.addComponents(
+			new MessageButton()
+				.setCustomID("Forward")
+				.setLabel("⏩")
+				.setStyle("SECONDARY"),
+		)];
+
+	const slides = pages.map((p: MessageEmbed | MessageOptions) => {
+		if (p instanceof MessageEmbed) {
+			return {
+				content: null,
+				embeds: [p],
+			}
+		}
+		return p
+	})
 
 	if (pages.length > 1) {
 
 		timeout = timeout ?? 120000;
 
 		const currentPage = await message.channel.send({
-				embeds: [pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))],
-				components: [new MessageActionRow()
-					.addComponents(
-						new MessageButton()
-							.setCustomID("Backward")
-							.setLabel("⏪")
-							.setStyle("SECONDARY"),
-					)
-					.addComponents(
-						new MessageButton()
-							.setCustomID("Forward")
-							.setLabel("⏩")
-							.setStyle("SECONDARY"),
-					)],
-			}
-		);
+			...slides[page],
+			components: row,
+		});
 
 		const collector = currentPage.createMessageComponentCollector({
 			filter: (i) => ["Forward", "Backward"].includes(i.customID) && owner
@@ -57,26 +70,27 @@ export async function sendPaginatedMessage(
 			await t.deferUpdate();
 			switch (t.customID) {
 				case "Backward": {
-					page = page > 0 ? --page : pages.length - 1;
+					page = page > 0 ? --page : slides.length - 1;
+					if (slides[page].embeds?.length) (slides[page].embeds?.[slides[page].embeds!.length - 1] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
 					break;
 				}
 				case "Forward": {
-					page = page + 1 < pages.length ? ++page : 0;
+					page = page + 1 < slides.length ? ++page : 0;
+					if (slides[page].embeds?.length) (slides[page].embeds?.[slides[page].embeds!.length - 1] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
 					break;
 				}
 				default: {
 					break;
 				}
 			}
-
+			if (slides[page].files) await currentPage.removeAttachments();
 			await currentPage.edit({
-				embeds:
-					[pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))]
+				...slides[page]
 			});
 		});
 
 		collector.once("end", async () => {
-			await currentPage.edit({ components: [] })
+			await currentPage.edit({components: []})
 			collector.stop();
 		});
 
@@ -85,9 +99,7 @@ export async function sendPaginatedMessage(
 
 	else {
 		return await message.channel.send({
-				embeds:
-					[pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))],
-			}
-		);
+				...slides[page]
+		});
 	}
 }
