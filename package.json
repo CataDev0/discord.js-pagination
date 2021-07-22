@@ -11,15 +11,13 @@
 	"publishConfig": {
 		"registry": "https://npm.pkg.github.com/"
 	},
-	"dependencies": {
-	},
 	"scripts": {
 		"install": "tsc"
 	},
 	"devDependencies": {
 		"@types/node": "^14.0.14",
 		"@types/ws": "^7.2.6",
-		"typescript": "^4.0.x",
-		"discord.js": "github:cataclym/discord.js"
+		"discord.js": "github:discordjs/discord.js",
+		"typescript": "^4.3.5"
 	}
 }

@@ -29,13 +29,13 @@ export async function sendPaginatedMessage(
 	const row = [new MessageActionRow()
 		.addComponents(
 			new MessageButton()
-				.setCustomID("Backward")
+				.setCustomId("Backward")
 				.setLabel("⏪")
 				.setStyle("SECONDARY"),
 		)
 		.addComponents(
 			new MessageButton()
-				.setCustomID("Forward")
+				.setCustomId("Forward")
 				.setLabel("⏩")
 				.setStyle("SECONDARY"),
 		)];
@@ -60,7 +60,7 @@ export async function sendPaginatedMessage(
 		});
 
 		const collector = currentPage.createMessageComponentCollector({
-			filter: (i) => ["Forward", "Backward"].includes(i.customID) && owner
+			filter: (i) => ["Forward", "Backward"].includes(i.customId) && owner
 				? owner.id === i.user.id
 				: true,
 			time: timeout,
@@ -68,7 +68,7 @@ export async function sendPaginatedMessage(
 
 		collector.on("collect", async (t) => {
 			await t.deferUpdate();
-			switch (t.customID) {
+			switch (t.customId) {
 				case "Backward": {
 					page = page > 0 ? --page : slides.length - 1;
 					if (slides[page].embeds?.length) (slides[page].embeds?.[slides[page].embeds!.length - 1] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
