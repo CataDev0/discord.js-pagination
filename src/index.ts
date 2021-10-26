@@ -18,7 +18,7 @@ export async function sendPaginatedMessage(
 	{ emojiList, footer, owner, timeout }: Partial<PageOptions>) {
 
 	const options: PageOptions = {
-		emojiList: emojiList ?? ['⏪', '⏩'],
+		emojiList: emojiList ?? ['⬅️', '➡️'],
 		timeout: timeout ?? 120000,
 		footer: footer ?? 'Showing page {current} of {max}',
 		owner: owner || null,
@@ -59,10 +59,24 @@ export async function sendPaginatedMessage(
 			components: row,
 		});
 
+		// await currentPage.awaitMessageComponent({
+		// 	componentType: "BUTTON",
+		// 	filter: args => {
+		// 		args.deferUpdate()
+		// 		return owner
+		// 			? owner.id === args.user.id
+		// 			: true
+		// 	},
+		// 	time: timeout
+		// })
+
 		const collector = currentPage.createMessageComponentCollector({
-			filter: (i) => ["Forward", "Backward"].includes(i.customId) && owner
-				? owner.id === i.user.id
-				: true,
+			filter: (i) => {
+				i.deferUpdate();
+				return ["Forward", "Backward"].includes(i.customId) && owner
+					? owner.id === i.user.id
+					: true
+			},
 			time: timeout,
 		})
 
