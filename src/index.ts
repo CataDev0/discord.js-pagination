@@ -30,13 +30,13 @@ export async function sendPaginatedMessage(
 		.addComponents(
 			new MessageButton()
 				.setCustomId("Backward")
-				.setLabel("⏪")
+				.setLabel(options.emojiList[0] ?? '⬅️')
 				.setStyle("SECONDARY"),
 		)
 		.addComponents(
 			new MessageButton()
 				.setCustomId("Forward")
-				.setLabel("⏩")
+				.setLabel(options.emojiList[1] ?? "➡️")
 				.setStyle("SECONDARY"),
 		)];
 
@@ -72,10 +72,13 @@ export async function sendPaginatedMessage(
 
 		const collector = currentPage.createMessageComponentCollector({
 			filter: (i) => {
-				i.deferUpdate();
-				return ["Forward", "Backward"].includes(i.customId) && owner
+				if (["Forward", "Backward"].includes(i.customId) && owner
 					? owner.id === i.user.id
-					: true
+					: true) return true;
+				else {
+					i.deferUpdate()
+					return false
+				}
 			},
 			time: timeout,
 		})
