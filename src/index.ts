@@ -15,7 +15,7 @@ export interface PageOptions {
 export async function sendPaginatedMessage(
 	message: Message,
 	pages: (MessageEmbed | MessageOptions)[],
-	{ emojiList, footer, owner, timeout }: Partial<PageOptions>) {
+	{ emojiList, footer, owner, timeout }: Partial<PageOptions>, startPage?: number) {
 
 	const options: PageOptions = {
 		emojiList: emojiList ?? ['⬅️', '➡️'],
@@ -24,7 +24,11 @@ export async function sendPaginatedMessage(
 		owner: owner || null,
 	};
 
-	let page = 0;
+	let page = startPage
+		? (startPage >= pages.length || startPage < 0)
+			? 0
+			: startPage
+		: 0;
 
 	const row = [new MessageActionRow()
 		.addComponents(
@@ -40,19 +44,21 @@ export async function sendPaginatedMessage(
 				.setStyle("SECONDARY"),
 		)];
 
-	const slides = pages.map((p: MessageEmbed | MessageOptions) => {
-		if (p instanceof MessageEmbed) {
-			return {
-				content: null,
-				embeds: [p],
-			}
-		}
-		return p
-	})
-
 	if (pages.length > 1) {
 
+		const slides = pages.map((p: MessageEmbed | MessageOptions, i) => {
+			if (p instanceof MessageEmbed) {
+				return {
+					content: null,
+					embeds: [p.setFooter(formatFooter(options.footer, i + 1, pages.length))],
+				}
+			}
+			return p
+		})
+
 		timeout = timeout ?? 120000;
+
+		// (slides[page].embeds![0] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
 
 		const currentPage = await message.channel.send({
 			...slides[page],
@@ -88,12 +94,12 @@ export async function sendPaginatedMessage(
 			switch (t.customId) {
 				case "Backward": {
 					page = page > 0 ? --page : slides.length - 1;
-					if (slides[page].embeds?.length) (slides[page].embeds?.[slides[page].embeds!.length - 1] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
+					// if (slides[page].embeds?.length) (slides[page].embeds?.[slides[page].embeds!.length - 1] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
 					break;
 				}
 				case "Forward": {
 					page = page + 1 < slides.length ? ++page : 0;
-					if (slides[page].embeds?.length) (slides[page].embeds?.[slides[page].embeds!.length - 1] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
+					// if (slides[page].embeds?.length) (slides[page].embeds?.[slides[page].embeds!.length - 1] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
 					break;
 				}
 				default: {
@@ -115,8 +121,17 @@ export async function sendPaginatedMessage(
 	}
 
 	else {
+		let page = pages[0];
+
+		if (page instanceof MessageEmbed) {
+			page = {
+				content: null,
+				embeds: [page],
+			}
+		}
+
 		return await message.channel.send({
-				...slides[page]
+			...page
 		});
 	}
 }
