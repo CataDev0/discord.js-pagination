@@ -58,23 +58,10 @@ export async function sendPaginatedMessage(
 
 		timeout = timeout ?? 120000;
 
-		// (slides[page].embeds![0] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
-
 		const currentPage = await message.channel.send({
 			...slides[page],
 			components: row,
 		});
-
-		// await currentPage.awaitMessageComponent({
-		// 	componentType: "BUTTON",
-		// 	filter: args => {
-		// 		args.deferUpdate()
-		// 		return owner
-		// 			? owner.id === args.user.id
-		// 			: true
-		// 	},
-		// 	time: timeout
-		// })
 
 		const collector = currentPage.createMessageComponentCollector({
 			filter: (i) => {
@@ -94,12 +81,10 @@ export async function sendPaginatedMessage(
 			switch (t.customId) {
 				case "Backward": {
 					page = page > 0 ? --page : slides.length - 1;
-					// if (slides[page].embeds?.length) (slides[page].embeds?.[slides[page].embeds!.length - 1] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
 					break;
 				}
 				case "Forward": {
 					page = page + 1 < slides.length ? ++page : 0;
-					// if (slides[page].embeds?.length) (slides[page].embeds?.[slides[page].embeds!.length - 1] as MessageEmbed).setFooter(formatFooter(options.footer, page + 1, pages.length))
 					break;
 				}
 				default: {

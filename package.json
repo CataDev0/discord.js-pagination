@@ -1,6 +1,6 @@
 {
 	"name": "discord-js-button-pagination-ts",
-	"version": "3.0.13",
+	"version": "3.1.0",
 	"description": "discord.js-pagination-ts modified to use buttons, and extended features.",
 	"main": "./dist/index.js",
 	"typings": "./dist/index.d.ts",
@@ -16,8 +16,8 @@
 		"install": "tsc"
 	},
 	"dependencies": {
-		"discord.js": "^13.3.1",
-		"typescript": "^4.4.4",
+		"discord.js": "^13.6.0",
+		"typescript": "^4.5.4",
 		"@types/node": "^16.6.0",
 		"@types/ws": "^7.2.6"
 	}

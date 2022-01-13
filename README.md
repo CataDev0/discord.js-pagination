@@ -2,6 +2,7 @@
 [jellz' discord.js-pagination](https://github.com/jellz/discord.js-pagination/) Modified and changed to use buttons.
 - Buttons
 - Select start page
+- Optional owner
 - Paginate Embeds and or messageOptions, or mix both! (This allows pagination of messages with only text on one page and multiple embeds on next page!)
 
 Usage
