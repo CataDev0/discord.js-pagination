@@ -50,7 +50,7 @@ export async function sendPaginatedMessage(
 			if (p instanceof MessageEmbed) {
 				return {
 					content: null,
-					embeds: [p.setFooter(formatFooter(options.footer, i + 1, pages.length))],
+					embeds: [p.setFooter({ text: formatFooter(options.footer, i + 1, pages.length)})],
 				}
 			}
 			return p
