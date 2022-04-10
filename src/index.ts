@@ -1,4 +1,11 @@
-import { Message, MessageEmbed, User, MessageActionRow, MessageButton, MessageOptions } from 'discord.js';
+import {
+	Message,
+	MessageEmbed,
+	User,
+	MessageActionRow,
+	MessageButton,
+	MessageOptions,
+} from 'discord.js';
 
 const formatFooter = (footer: string, current: number, max: number) =>
 	footer
@@ -52,6 +59,10 @@ export async function sendPaginatedMessage(
 					content: null,
 					embeds: [p.setFooter({ text: formatFooter(options.footer, i + 1, pages.length)})],
 				}
+			}
+			else if (p.embeds?.length) {
+				p.embeds[p.embeds.length - 1] = new MessageEmbed(p.embeds[p.embeds.length - 1]).setFooter(({ text: formatFooter(options.footer, i + 1, pages.length)}))
+				return p
 			}
 			return p
 		})
