@@ -62,8 +62,9 @@ export async function sendPaginatedMessage(
 			}
 			else if (p.embeds?.length) {
 				p.embeds[p.embeds.length - 1] = new MessageEmbed(p.embeds[p.embeds.length - 1]).setFooter(({ text: formatFooter(options.footer, i + 1, pages.length)}))
-				return p
 			}
+			p.content = p.content || null;
+			p.embeds = p.embeds || [];
 			return p
 		})
 
