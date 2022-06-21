@@ -4,7 +4,7 @@ import {
 	User,
 	MessageActionRow,
 	MessageButton,
-	MessageOptions,
+	MessageOptions, MessageEditOptions,
 } from 'discord.js';
 
 const formatFooter = (footer: string, current: number, max: number) =>
@@ -105,7 +105,7 @@ export async function sendPaginatedMessage(
 			}
 			if (slides[page].files) await currentPage.removeAttachments();
 			await currentPage.edit({
-				...slides[page]
+				...slides[page] as MessageEditOptions
 			});
 		});
 
