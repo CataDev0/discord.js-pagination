@@ -1,10 +1,12 @@
 import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	EmbedBuilder,
+	EmbedData,
 	Message,
-	MessageEmbed,
+	MessageCreateOptions,
+	MessageEditOptions,
 	User,
-	MessageActionRow,
-	MessageButton,
-	MessageOptions, MessageEditOptions,
 } from 'discord.js';
 
 const formatFooter = (footer: string, current: number, max: number) =>
@@ -21,7 +23,7 @@ export interface PageOptions {
 
 export async function sendPaginatedMessage(
 	message: Message,
-	pages: (MessageEmbed | MessageOptions)[],
+	pages: (EmbedBuilder | MessageCreateOptions)[],
 	{ emojiList, footer, owner, timeout }: Partial<PageOptions>, startPage?: number) {
 
 	const options: PageOptions = {
@@ -37,33 +39,32 @@ export async function sendPaginatedMessage(
 			: startPage
 		: 0;
 
-	const row = [new MessageActionRow()
+	const row = [new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId("Backward")
 				.setLabel(options.emojiList[0] ?? '⬅️')
-				.setStyle("SECONDARY"),
+				.setStyle(2),
 		)
 		.addComponents(
-			new MessageButton()
+			new ButtonBuilder()
 				.setCustomId("Forward")
 				.setLabel(options.emojiList[1] ?? "➡️")
-				.setStyle("SECONDARY"),
+				.setStyle(2),
 		)];
 
 	if (pages.length > 1) {
 
-		const slides = pages.map((p: MessageEmbed | MessageOptions, i) => {
-			if (p instanceof MessageEmbed) {
+		const slides = pages.map((p: EmbedBuilder | MessageCreateOptions, i) => {
+			if (p instanceof EmbedBuilder) {
 				return {
-					content: null,
+					content: undefined,
 					embeds: [p.setFooter({ text: formatFooter(options.footer, i + 1, pages.length)})],
 				}
 			}
 			else if (p.embeds?.length) {
-				p.embeds[p.embeds.length - 1] = new MessageEmbed(p.embeds[p.embeds.length - 1]).setFooter(({ text: formatFooter(options.footer, i + 1, pages.length)}))
+				p.embeds[p.embeds.length - 1] = new EmbedBuilder(p.embeds[p.embeds.length - 1] as EmbedData).setFooter(({ text: formatFooter(options.footer, i + 1, pages.length)}))
 			}
-			p.content = p.content || null;
 			p.embeds = p.embeds || [];
 			return p
 		})
@@ -120,9 +121,9 @@ export async function sendPaginatedMessage(
 	else {
 		let page = pages[0];
 
-		if (page instanceof MessageEmbed) {
+		if (page instanceof EmbedBuilder) {
 			page = {
-				content: null,
+				content: undefined,
 				embeds: [page],
 			}
 		}
