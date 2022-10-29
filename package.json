@@ -16,9 +16,9 @@
 		"install": "tsc"
 	},
 	"dependencies": {
-		"discord.js": "^14.6.0",
-		"typescript": "^4.8.4",
-		"@types/node": "^16.11.66",
-		"@types/ws": "^7.2.6"
+		"discord.js": "^14.6.0"
+	},
+	"devDependencies": {
+		"typescript": "^4.6.2"
 	}
 }
