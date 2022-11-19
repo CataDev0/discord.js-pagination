@@ -1,10 +1,9 @@
 import {
 	ActionRowBuilder,
+	BaseMessageOptions,
 	ButtonBuilder,
 	EmbedBuilder,
-	EmbedData,
 	Message,
-	MessageCreateOptions,
 	MessageEditOptions,
 	User,
 } from 'discord.js';
@@ -23,7 +22,7 @@ export interface PageOptions {
 
 export async function sendPaginatedMessage(
 	message: Message,
-	pages: (EmbedBuilder | MessageCreateOptions)[],
+	pages: (EmbedBuilder | BaseMessageOptions)[],
 	{ emojiList, footer, owner, timeout }: Partial<PageOptions>, startPage?: number) {
 
 	const options: PageOptions = {
@@ -55,21 +54,20 @@ export async function sendPaginatedMessage(
 
 	if (pages.length > 1) {
 
-		const slides = pages.map((p: EmbedBuilder | MessageCreateOptions, i) => {
+		const slides: BaseMessageOptions[] = pages.map((p, i) => {
 			if (p instanceof EmbedBuilder) {
 				return {
 					content: undefined,
 					embeds: [p.setFooter({ text: formatFooter(options.footer, i + 1, pages.length)})],
 				}
 			}
-			else if (p.embeds?.length) {
-				p.embeds[p.embeds.length - 1] = new EmbedBuilder(p.embeds[p.embeds.length - 1] as EmbedData).setFooter(({ text: formatFooter(options.footer, i + 1, pages.length)}))
+			else {
+				if (p.embeds?.length) {
+					p.embeds[p.embeds.length - 1] = EmbedBuilder.from(p.embeds[p.embeds.length - 1]).setFooter(({text: formatFooter(options.footer, i + 1, pages.length)}))
+				}
+				return p;
 			}
-			p.embeds = p.embeds || [];
-			return p
 		})
-
-		timeout = timeout ?? 120000;
 
 		const currentPage = await message.channel.send({
 			...slides[page],
@@ -104,7 +102,7 @@ export async function sendPaginatedMessage(
 					break;
 				}
 			}
-			if (slides[page].files) await currentPage.removeAttachments();
+			if (slides[page]?.files) await currentPage.removeAttachments();
 			await currentPage.edit({
 				...slides[page] as MessageEditOptions
 			});

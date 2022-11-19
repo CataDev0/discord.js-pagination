@@ -5,25 +5,29 @@
 - Optional owner
 - Paginate Embeds and or messageOptions, or mix both! (This allows pagination of messages with only text on one page and multiple embeds on next page!)
 
-Usage
+**Requirements**
+
+		"typescript": "^4.6.2",
+		"discord.js": "^14.6.0"
+
+**Usage**
 ```ts
 import { sendPaginatedMessage } from "discord-js-button-pagination-ts";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 
 new command("Example command", async (message: Message) => {
-    const pages = [new MessageEmbed()
+    const pages = [new EmbedBuilder()
         .setDescription("Page 1"),
-        // Pages can be the messageOptions object
+        // Pages can be the BaseMessageOptions object
         {
             content: "Page 2",
-            embeds: [new MessageEmbed()
-                .setDescription("Embed on page 2"),
-                new MessageEmbed()
+            embeds: [
+                new EmbedBuilder()
+                    .setDescription("Embed on page 2"),
+                new EmbedBuilder()
                     .setDescription("Another embed on page 2")],
         }];
 
     await sendPaginatedMessage(message, pages, { owner: message.author, timeout: 30000 });
 });
 ```
-
-TODO: Update this.
