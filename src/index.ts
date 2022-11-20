@@ -27,7 +27,7 @@ export async function sendPaginatedMessage(
 
 	const options: PageOptions = {
 		emojiList: emojiList ?? ['⬅️', '➡️'],
-		timeout: timeout ?? 120000,
+		timeout: timeout || 120000,
 		footer: footer ?? 'Showing page {current} of {max}',
 		owner: owner || null,
 	};
@@ -84,7 +84,7 @@ export async function sendPaginatedMessage(
 					return false
 				}
 			},
-			time: timeout,
+			time: options.timeout,
 		})
 
 		collector.on("collect", async (t) => {
