@@ -5,7 +5,7 @@
 	"main": "./dist/index.js",
 	"typings": "./dist/index.d.ts",
 	"repository": "https://gitlab.com/cataclym/discord-js-pagination",
-	"author": "Ole Hagberg <ole.kh@hotmail.com>",
+	"author": "Cata <cata@libernets.org>",
 	"license": "MIT",
 	"private": false,
 	"publishConfig": {
