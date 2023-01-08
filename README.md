@@ -7,8 +7,7 @@
 
 **Requirements**
 
-		"typescript": "^4.6.2",
-		"discord.js": "^14.6.0"
+discord.js ^14.6.0 - Or newer
 
 **Usage**
 ```ts
