@@ -1,4 +1,7 @@
+
 # discord-js-button-pagination-ts
+[![npm version](https://badge.fury.io/js/discord-js-button-pagination-ts.svg)](https://badge.fury.io/js/discord-js-button-pagination-ts)
+
 [jellz' discord.js-pagination](https://github.com/jellz/discord.js-pagination/) Modified and changed to use buttons.
 - Buttons
 - Select start page
@@ -30,3 +33,7 @@ new command("Example command", async (message: Message) => {
     await sendPaginatedMessage(message, pages, { owner: message.author, timeout: 30000 });
 });
 ```
+
+---
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C0C3IJV8A)
