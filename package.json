@@ -9,7 +9,7 @@
 	],
 	"type": "commonjs",
 	"repository": "https://gitlab.com/cataclym/discord-js-pagination",
-	"author": "Cata <cata@libernets.org>",
+	"author": "Cata <cata@cata.moe>",
 	"license": "MIT",
 	"private": false,
 	"publishConfig": {
