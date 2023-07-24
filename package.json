@@ -8,7 +8,8 @@
 		"dist"
 	],
 	"type": "commonjs",
-	"repository": "https://gitlab.com/cataclym/discord-js-pagination",
+	"keywords": ["Discord", "Discord.js"],
+	"repository": "https://gitlab.com/catadev/discord-js-pagination",
 	"author": "Cata <cata@cata.moe>",
 	"license": "MIT",
 	"private": false,

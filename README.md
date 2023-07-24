@@ -6,11 +6,13 @@
 - Buttons
 - Select start page
 - Optional owner
-- Paginate Embeds and or messageOptions, or mix both! (This allows pagination of messages with only text on one page and multiple embeds on next page!)
+- Paginate Embeds and or messageOptions, or mix both!
+
+This allows pagination of messages with only text on one page and multiple embeds on next page!
 
 **Requirements**
 
-discord.js ^14.6.0 - Or newer
+[discord.js](https://www.npmjs.com/package/discord.js) ^14.6.0 - Or newer
 
 **Usage**
 ```ts
