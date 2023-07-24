@@ -4,7 +4,6 @@ import {
 	ButtonBuilder,
 	EmbedBuilder,
 	Message,
-	MessageEditOptions,
 	User,
 } from 'discord.js';
 
@@ -69,18 +68,18 @@ export async function sendPaginatedMessage(
 			}
 		})
 
-		const currentPage = await message.channel.send({
+		const currentMessage = await message.channel.send({
 			...slides[page],
 			components: row,
 		});
 
-		const collector = currentPage.createMessageComponentCollector({
-			filter: (i) => {
+		const collector = currentMessage.createMessageComponentCollector({
+			filter: async (i) => {
 				if (["Forward", "Backward"].includes(i.customId) && owner
 					? owner.id === i.user.id
 					: true) return true;
 				else {
-					i.deferUpdate()
+					await i.deferUpdate()
 					return false
 				}
 			},
@@ -88,7 +87,10 @@ export async function sendPaginatedMessage(
 		})
 
 		collector.on("collect", async (t) => {
-			await t.deferUpdate();
+			if (!t.deferred) {
+				await t.deferUpdate();
+			}
+
 			switch (t.customId) {
 				case "Backward": {
 					page = page > 0 ? --page : slides.length - 1;
@@ -102,18 +104,20 @@ export async function sendPaginatedMessage(
 					break;
 				}
 			}
-			if (slides[page]?.files) await currentPage.removeAttachments();
-			await currentPage.edit({
-				...slides[page] as MessageEditOptions
+			await currentMessage.edit({
+				...slides[page],
+				content: slides[page].content || null,
+				files: slides[page].files || [],
+				components: row,
 			});
 		});
 
 		collector.once("end", async () => {
-			await currentPage.edit({components: []})
+			await currentMessage.edit({components: []})
 			collector.stop();
 		});
 
-		return currentPage;
+		return currentMessage;
 	}
 
 	else {
