@@ -1,4 +1,11 @@
-import { Message, MessageEmbed, User } from 'discord.js';
+import {
+	ActionRowBuilder,
+	BaseMessageOptions,
+	ButtonBuilder,
+	EmbedBuilder,
+	Message,
+	User,
+} from 'discord.js';
 
 const formatFooter = (footer: string, current: number, max: number) =>
 	footer
@@ -12,53 +19,119 @@ export interface PageOptions {
 	owner: User | null;
 }
 
-export async function editMessageWithPaginatedEmbeds(
+export async function sendPaginatedMessage(
 	message: Message,
-	pages: MessageEmbed[],
-	{ emojiList, footer, owner, timeout }: Partial<PageOptions>
-) {
+	pages: (EmbedBuilder | BaseMessageOptions)[],
+	{ emojiList, footer, owner, timeout }: Partial<PageOptions>, startPage?: number) {
+
 	const options: PageOptions = {
-		emojiList: emojiList ?? ['⏪', '⏩'],
-		timeout: timeout ?? 120000,
+		emojiList: emojiList ?? ['⬅️', '➡️'],
+		timeout: timeout || 120000,
 		footer: footer ?? 'Showing page {current} of {max}',
 		owner: owner || null,
 	};
-	let page = 0;
 
-	const currentPage = await message.channel.send(
-		pages[page].setFooter(formatFooter(options.footer, page + 1, pages.length))
-	);
+	let page = startPage
+		? (startPage >= pages.length || startPage < 0)
+			? 0
+			: startPage
+		: 0;
+
+	const row = [new ActionRowBuilder<ButtonBuilder>()
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId("Backward")
+				.setLabel(options.emojiList[0] ?? '⬅️')
+				.setStyle(2),
+		)
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId("Forward")
+				.setLabel(options.emojiList[1] ?? "➡️")
+				.setStyle(2),
+		)];
 
 	if (pages.length > 1) {
-		for (const emoji of options.emojiList) await currentPage.react(emoji);
-		const reactionCollector = currentPage.createReactionCollector(
-			(reaction, user) =>
-				options.emojiList.includes(reaction.emoji.name) &&
-				!user.bot &&
-				(options.owner ? options.owner.id === user.id : true),
-			{ time: options.timeout }
-		);
-		reactionCollector.on('collect', (reaction, user) => {
-			reaction.users.remove(user);
-			switch (reaction.emoji.name) {
-				case options.emojiList[0]:
-					page = page > 0 ? --page : pages.length - 1;
-					break;
-				case options.emojiList[1]:
-					page = page + 1 < pages.length ? ++page : 0;
-					break;
-				default:
-					break;
+
+		const slides: BaseMessageOptions[] = pages.map((p, i) => {
+			if (p instanceof EmbedBuilder) {
+				return {
+					content: undefined,
+					embeds: [p.setFooter({ text: formatFooter(options.footer, i + 1, pages.length)})],
+				}
 			}
-			currentPage.edit(
-				pages[page].setFooter(
-					formatFooter(options.footer, page + 1, pages.length)
-				)
-			);
+			else {
+				if (p.embeds?.length) {
+					p.embeds[p.embeds.length - 1] = EmbedBuilder.from(p.embeds[p.embeds.length - 1]).setFooter(({text: formatFooter(options.footer, i + 1, pages.length)}))
+				}
+				return p;
+			}
+		})
+
+		const currentMessage = await message.channel.send({
+			...slides[page],
+			components: row,
 		});
 
-		reactionCollector.on('end', () => currentPage.reactions.removeAll());
+		const collector = currentMessage.createMessageComponentCollector({
+			filter: async (i) => {
+				if (["Forward", "Backward"].includes(i.customId) && owner
+					? owner.id === i.user.id
+					: true) return true;
+				else {
+					await i.deferUpdate()
+					return false
+				}
+			},
+			time: options.timeout,
+		})
+
+		collector.on("collect", async (t) => {
+			if (!t.deferred) {
+				await t.deferUpdate();
+			}
+
+			switch (t.customId) {
+				case "Backward": {
+					page = page > 0 ? --page : slides.length - 1;
+					break;
+				}
+				case "Forward": {
+					page = page + 1 < slides.length ? ++page : 0;
+					break;
+				}
+				default: {
+					break;
+				}
+			}
+			await currentMessage.edit({
+				...slides[page],
+				content: slides[page].content || null,
+				files: slides[page].files || [],
+				components: row,
+			});
+		});
+
+		collector.once("end", async () => {
+			await currentMessage.edit({components: []})
+			collector.stop();
+		});
+
+		return currentMessage;
 	}
 
-	return currentPage;
+	else {
+		let page = pages[0];
+
+		if (page instanceof EmbedBuilder) {
+			page = {
+				content: undefined,
+				embeds: [page],
+			}
+		}
+
+		return await message.channel.send({
+			...page
+		});
+	}
 }
