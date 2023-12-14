@@ -3,9 +3,10 @@ import {
 	BaseMessageOptions,
 	ButtonBuilder,
 	EmbedBuilder,
-	Message,
+	Message, MessageEditOptions,
 	User,
 } from 'discord.js';
+import Utils from "./Utils";
 
 const formatFooter = (footer: string, current: number, max: number) =>
 	footer
@@ -54,17 +55,16 @@ export async function sendPaginatedMessage(
 	if (pages.length > 1) {
 
 		const slides: BaseMessageOptions[] = pages.map((p, i) => {
-			if (p instanceof EmbedBuilder) {
-				return {
-					content: undefined,
-					embeds: [p.setFooter({ text: formatFooter(options.footer, i + 1, pages.length)})],
-				}
-			}
-			else {
+			if (Utils.isBaseMessageOptions(p)) {
 				if (p.embeds?.length) {
 					p.embeds[p.embeds.length - 1] = EmbedBuilder.from(p.embeds[p.embeds.length - 1]).setFooter(({text: formatFooter(options.footer, i + 1, pages.length)}))
 				}
 				return p;
+			} else {
+				return {
+					content: undefined,
+					embeds: [p.setFooter({text: formatFooter(options.footer, i + 1, pages.length)})],
+				}
 			}
 		})
 
@@ -87,9 +87,7 @@ export async function sendPaginatedMessage(
 		})
 
 		collector.on("collect", async (t) => {
-			if (!t.deferred) {
-				await t.deferUpdate();
-			}
+			if (!t.deferred) await t.deferUpdate();
 
 			switch (t.customId) {
 				case "Backward": {
@@ -104,12 +102,15 @@ export async function sendPaginatedMessage(
 					break;
 				}
 			}
-			await currentMessage.edit({
+
+			const content: MessageEditOptions = {
 				...slides[page],
 				content: slides[page].content || null,
 				files: slides[page].files || [],
 				components: row,
-			});
+			}
+
+			await currentMessage.edit(content);
 		});
 
 		collector.once("end", async () => {
@@ -123,7 +124,7 @@ export async function sendPaginatedMessage(
 	else {
 		let page = pages[0];
 
-		if (page instanceof EmbedBuilder) {
+		if (!Utils.isBaseMessageOptions(page)) {
 			page = {
 				content: undefined,
 				embeds: [page],
