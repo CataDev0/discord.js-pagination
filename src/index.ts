@@ -91,8 +91,8 @@ export async function sendPaginatedMessage(
 					if (options.allowEveryone) {
 						return true;
 					}
-					if (options.owner) {
-						return options.owner.id === i.user.id;
+					if (options.owner && options.owner.id === i.user.id) {
+						return true
 					}
 				}
 
