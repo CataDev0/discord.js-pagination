@@ -1,6 +1,6 @@
 {
 	"name": "discord-js-button-pagination-ts",
-	"version": "4.2.0-1",
+	"version": "4.2.0-2",
 	"description": "discord.js-pagination-ts modified to use buttons, and extended features.",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
@@ -12,7 +12,10 @@
 		"Discord",
 		"Discord.js"
 	],
-	"repository": "https://gitlab.com/catadev/discord-js-pagination",
+	"repository": {
+		"type": "git",
+		"url": "git+https://gitlab.com/catadev/discord-js-pagination.git"
+	},
 	"author": "Cata <cata@cata.moe>",
 	"license": "MIT",
 	"private": false,
