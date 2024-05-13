@@ -94,7 +94,6 @@ export async function sendPaginatedMessage(
 					else if (allowEveryone) {
 						return true;
 					}
-					return false;
 				}
 
 				await i.deferUpdate()
