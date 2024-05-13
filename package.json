@@ -1,6 +1,6 @@
 {
 	"name": "discord-js-button-pagination-ts",
-	"version": "4.2.0-7",
+	"version": "4.2.0",
 	"description": "discord.js-pagination-ts modified to use buttons, and extended features.",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
