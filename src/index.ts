@@ -16,18 +16,18 @@ const formatFooter = (footer: string, current: number, max: number) =>
 		.replace('{max}', max.toString());
 
 /**
- * @property {[string, string]} emojiList - Customize emojis to use, defaults to arrows
- * @property {Number} timeout - How long buttons show in ms, defaults to 120000
- * @property {String} footer - Footer text, defaults to page numbers
- * @property {User | Null} owner - The user that gets control of buttons. Overrides {@link allowEveryone}, defaults to message author
- * @property {Boolean} allowEveryone - Whether buttons are usable by everyone, defaults to false
+ * @property {[string, string]} emojiList - Customize emojis to use. Defaults to arrows
+ * @property {Number} timeout - How long buttons show in ms. Defaults to 120000
+ * @property {String} footer - Footer text. Defaults to page numbers
+ * @property {User} owner - The user that gets control of buttons. Defaults to message author
+ * @property {Boolean} allowEveryone - Whether buttons are usable by everyone. Overrides {@link owner}. Defaults to false
  * @property {Number} startPage - Page to start at. Defaults to 0
  */
 export interface PageOptions {
 	emojiList: [string, string];
 	timeout: number;
 	footer: string;
-	owner: User | null;
+	owner: User;
 	allowEveryone: boolean;
 	startPage: number
 }
@@ -91,13 +91,13 @@ export async function sendPaginatedMessage(
 					if (options.allowEveryone) {
 						return true;
 					}
-					if (options.owner && options.owner.id === i.user.id) {
-						return true
+					if (options.owner.id === i.user.id) {
+						return true;
 					}
 				}
 
-				await i.deferUpdate()
-				return false
+				await i.deferUpdate();
+				return false;
 			},
 			time: options.timeout,
 		})
