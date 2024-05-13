@@ -35,15 +35,15 @@ export interface PageOptions {
 export async function sendPaginatedMessage(
 	message: Message,
 	pages: (EmbedBuilder | BaseMessageOptions)[],
-	{ emojiList, footer, owner, timeout, allowEveryone, startPage }: Partial<PageOptions> = {}) {
+	inputOptions: Partial<PageOptions> = {}) {
 
 	const options: PageOptions = {
-		emojiList: emojiList ?? ['⬅️', '➡️'],
-		timeout: timeout || 120000,
-		footer: footer ?? 'Showing page {current} of {max}',
-		owner: owner || message.author,
-		allowEveryone: allowEveryone || false,
-		startPage: startPage || 0
+		emojiList: inputOptions.emojiList ?? ['⬅️', '➡️'],
+		timeout: inputOptions.timeout || 120000,
+		footer: inputOptions.footer ?? 'Showing page {current} of {max}',
+		owner: inputOptions.owner || message.author,
+		allowEveryone: inputOptions.allowEveryone || false,
+		startPage: inputOptions.startPage || 0
 	};
 
 	let page = options.startPage >= pages.length || options.startPage < 0
@@ -88,11 +88,11 @@ export async function sendPaginatedMessage(
 		const collector = currentMessage.createMessageComponentCollector({
 			filter: async (i) => {
 				if (["Forward", "Backward"].includes(i.customId)) {
-					if (owner) {
-						return owner.id === i.user.id;
-					}
-					else if (allowEveryone) {
+					if (options.allowEveryone) {
 						return true;
+					}
+					if (options.owner) {
+						return options.owner.id === i.user.id;
 					}
 				}
 
