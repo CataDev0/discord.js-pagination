@@ -1,8 +1,10 @@
 import {
+	APIEmbed,
 	ActionRowBuilder,
 	BaseMessageOptions,
 	ButtonBuilder,
 	EmbedBuilder,
+	JSONEncodable,
 	Message, MessageEditOptions,
 	User,
 } from 'discord.js';
@@ -13,30 +15,40 @@ const formatFooter = (footer: string, current: number, max: number) =>
 		.replace('{current}', current.toString())
 		.replace('{max}', max.toString());
 
+/**
+ * @property {[string, string]} emojiList - Customize emojis to use, defaults to arrows
+ * @property {Number} timeout - How long buttons show in ms, defaults to 120000
+ * @property {String} footer - Footer text, defaults to page numbers
+ * @property {User | Null} owner - The user that gets control of buttons. Overrides {@link allowEveryone}, defaults to message author
+ * @property {Boolean} allowEveryone - Whether buttons are usable by everyone, defaults to false
+ * @property {Number} startPage - Page to start at. Defaults to 0
+ */
 export interface PageOptions {
 	emojiList: [string, string];
 	timeout: number;
 	footer: string;
 	owner: User | null;
+	allowEveryone: boolean;
+	startPage: number
 }
 
 export async function sendPaginatedMessage(
 	message: Message,
 	pages: (EmbedBuilder | BaseMessageOptions)[],
-	{ emojiList, footer, owner, timeout }: Partial<PageOptions>, startPage?: number) {
+	{ emojiList, footer, owner, timeout, allowEveryone, startPage }: Partial<PageOptions>) {
 
 	const options: PageOptions = {
 		emojiList: emojiList ?? ['⬅️', '➡️'],
 		timeout: timeout || 120000,
 		footer: footer ?? 'Showing page {current} of {max}',
-		owner: owner || null,
+		owner: owner || message.author,
+		allowEveryone: allowEveryone || false,
+		startPage: startPage || 0
 	};
 
-	let page = startPage
-		? (startPage >= pages.length || startPage < 0)
+	let page = options.startPage >= pages.length || options.startPage < 0
 			? 0
-			: startPage
-		: 0;
+			: options.startPage;
 
 	const row = [new ActionRowBuilder<ButtonBuilder>()
 		.addComponents(
@@ -57,7 +69,7 @@ export async function sendPaginatedMessage(
 		const slides: BaseMessageOptions[] = pages.map((p, i) => {
 			if (Utils.isBaseMessageOptions(p)) {
 				if (p.embeds?.length) {
-					p.embeds[p.embeds.length - 1] = EmbedBuilder.from(p.embeds[p.embeds.length - 1]).setFooter(({text: formatFooter(options.footer, i + 1, pages.length)}))
+					(p.embeds as (APIEmbed | JSONEncodable<APIEmbed>)[])[p.embeds.length - 1] = EmbedBuilder.from(p.embeds[p.embeds.length - 1]).setFooter(({text: formatFooter(options.footer, i + 1, pages.length)}))
 				}
 				return p;
 			} else {
@@ -75,13 +87,18 @@ export async function sendPaginatedMessage(
 
 		const collector = currentMessage.createMessageComponentCollector({
 			filter: async (i) => {
-				if (["Forward", "Backward"].includes(i.customId) && owner
-					? owner.id === i.user.id
-					: true) return true;
-				else {
-					await i.deferUpdate()
-					return false
+				if (["Forward", "Backward"].includes(i.customId)) {
+					if (owner) {
+						return owner.id === i.user.id;
+					}
+					else if (allowEveryone) {
+						return true;
+					}
+					return true;
 				}
+
+				await i.deferUpdate()
+				return false
 			},
 			time: options.timeout,
 		})

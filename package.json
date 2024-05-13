@@ -21,11 +21,18 @@
 		"registry": "https://registry.npmjs.org/"
 	},
 	"scripts": {
-		"prepublish": "tsc"
+		"prepublish": "tsc",
+		"docs": "typedoc"
+	},
+	"dependencies": {
+		"discord.js": "^14.14.1 - ^14.15.0"
 	},
 	"devDependencies": {
 		"@types/node": "^20.10.4",
 		"typescript": "^5.3.3",
-		"discord.js": "^14.14.1"
+		"typedoc": "^0.25.7",
+		"typedoc-plugin-mdn-links": "^3.1.13",
+		"typedoc-plugin-missing-exports": "^2.2.0",
+		"typedoc-plugin-rename-defaults": "^0.7.0"
 	}
 }

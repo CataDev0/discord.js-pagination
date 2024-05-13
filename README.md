@@ -2,20 +2,24 @@
 # discord-js-button-pagination-ts
 [![npm version](https://badge.fury.io/js/discord-js-button-pagination-ts.svg)](https://badge.fury.io/js/discord-js-button-pagination-ts)
 
-[jellz' discord.js-pagination](https://github.com/jellz/discord.js-pagination/) Modified and changed to use buttons.
-- Buttons
+#### Heavily modified [jellz' discord.js-pagination](https://github.com/jellz/discord.js-pagination/), changed to use buttons.
+
+- Buttons, with custom emoji
 - Select start page
-- Optional owner
+- Allow a specific member, or everyone to use buttons 
 - Paginate Embeds and or messageOptions, or mix both!
 
-This allows pagination of messages with only text on one page and multiple embeds on next page!
+This allows unique pagination of messages with only text on one page and multiple embeds on next page!
 
 **Requirements**
 
-[discord.js](https://www.npmjs.com/package/discord.js) ^14.6.0 - Or newer
+[discord.js](https://www.npmjs.com/package/discord.js) ^14.14.1 - Or newer
 
-**Usage**
-```ts
+## [Documentation](https://cataclym.github.io/discord.js-pagination/)
+### Quick overview
+
+#### General Usage
+```ts 
 import { sendPaginatedMessage } from "discord-js-button-pagination-ts";
 import { Message, EmbedBuilder } from "discord.js";
 
@@ -31,9 +35,13 @@ new command("Example command", async (message: Message) => {
                 new EmbedBuilder()
                     .setDescription("Another embed on page 2")],
         }];
-
+    
     await sendPaginatedMessage(message, pages, { owner: message.author, timeout: 30000 });
 });
+```
+#### Setting custom emojis and allowing everyone
+```ts
+await sendPaginatedMessage(message, pages, { allowEveryone: true, emojiList: ['👈', '👉'] });
 ```
 
 ---
