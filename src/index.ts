@@ -35,7 +35,7 @@ export interface PageOptions {
 export async function sendPaginatedMessage(
 	message: Message,
 	pages: (EmbedBuilder | BaseMessageOptions)[],
-	{ emojiList, footer, owner, timeout, allowEveryone, startPage }: Partial<PageOptions>) {
+	{ emojiList, footer, owner, timeout, allowEveryone, startPage }: Partial<PageOptions> = {}) {
 
 	const options: PageOptions = {
 		emojiList: emojiList ?? ['⬅️', '➡️'],
