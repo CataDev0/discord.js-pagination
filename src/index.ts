@@ -32,10 +32,23 @@ export interface PageOptions {
 	startPage: number
 }
 
+// Overloads
 export async function sendPaginatedMessage(
-	message: Message,
+	message: Message<false>,
 	pages: (EmbedBuilder | BaseMessageOptions)[],
-	inputOptions: Partial<PageOptions> = {}) {
+	inputOptions?: Partial<PageOptions>
+): Promise<void>;
+
+export async function sendPaginatedMessage(
+	message: Message<true>,
+	pages: (EmbedBuilder | BaseMessageOptions)[],
+	inputOptions?: Partial<PageOptions>
+): Promise<void>;
+
+export async function sendPaginatedMessage<M extends boolean>(
+	message: Message<M>,
+	pages: (EmbedBuilder | BaseMessageOptions)[],
+	inputOptions: Partial<PageOptions> = {}): Promise<void> {
 
 	const options: PageOptions = {
 		emojiList: inputOptions.emojiList ?? ['⬅️', '➡️'],
@@ -80,7 +93,7 @@ export async function sendPaginatedMessage(
 			}
 		})
 
-		const currentMessage = await message.channel.send({
+		const currentMessage = await (message.inGuild() ? message.channel.send : message.reply)({
 			...slides[page],
 			components: row,
 		});
@@ -134,7 +147,7 @@ export async function sendPaginatedMessage(
 			collector.stop();
 		});
 
-		return currentMessage;
+		return;
 	}
 
 	else {
@@ -147,7 +160,7 @@ export async function sendPaginatedMessage(
 			}
 		}
 
-		return await message.channel.send({
+		await (message.inGuild() ? message.channel.send : message.reply)({
 			...page
 		});
 	}
