@@ -45,6 +45,12 @@ export async function sendPaginatedMessage(
 	inputOptions?: Partial<PageOptions>
 ): Promise<void>;
 
+export async function sendPaginatedMessage(
+	message: Message,
+	pages: (EmbedBuilder | BaseMessageOptions)[],
+	inputOptions?: Partial<PageOptions>
+): Promise<void>;
+
 export async function sendPaginatedMessage<M extends boolean>(
 	message: Message<M>,
 	pages: (EmbedBuilder | BaseMessageOptions)[],
