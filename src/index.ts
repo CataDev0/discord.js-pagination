@@ -51,6 +51,7 @@ export async function sendPaginatedMessage(
 	inputOptions?: Partial<PageOptions>
 ): Promise<void>;
 
+// Implementation
 export async function sendPaginatedMessage<M extends boolean>(
 	message: Message<M>,
 	pages: (EmbedBuilder | BaseMessageOptions)[],
@@ -99,7 +100,7 @@ export async function sendPaginatedMessage<M extends boolean>(
 			}
 		})
 
-		const currentMessage = await (message.inGuild() ? message.channel.send : message.reply)({
+		const currentMessage = await message.reply({
 			...slides[page],
 			components: row,
 		});
@@ -166,7 +167,7 @@ export async function sendPaginatedMessage<M extends boolean>(
 			}
 		}
 
-		await (message.inGuild() ? message.channel.send : message.reply)({
+		await message.reply({
 			...page
 		});
 	}
