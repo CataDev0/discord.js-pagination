@@ -1,5 +1,4 @@
 import {
-	APIEmbed,
 	ActionRowBuilder,
 	BaseMessageOptions,
 	ButtonBuilder,
@@ -12,8 +11,8 @@ import Utils from "./Utils";
 
 const formatFooter = (footer: string, current: number, max: number) =>
 	footer
-		.replace('{current}', current.toString())
-		.replace('{max}', max.toString());
+		.replace('{%c}', current.toString())
+		.replace('{%m}', max.toString());
 
 /**
  * @property {[string, string]} emojiList - Customize emojis to use. Defaults to arrows
@@ -60,7 +59,7 @@ export async function sendPaginatedMessage<M extends boolean>(
 	const options: PageOptions = {
 		emojiList: inputOptions.emojiList ?? ['⬅️', '➡️'],
 		timeout: inputOptions.timeout || 120000,
-		footer: inputOptions.footer ?? 'Showing page {current} of {max}',
+		footer: inputOptions.footer ?? 'Showing page {%c} of {%m}',
 		owner: inputOptions.owner || message.author,
 		allowEveryone: inputOptions.allowEveryone || false,
 		startPage: inputOptions.startPage || 0
@@ -70,26 +69,24 @@ export async function sendPaginatedMessage<M extends boolean>(
 			? 0
 			: options.startPage;
 
-	const row = [new ActionRowBuilder<ButtonBuilder>()
-		.addComponents(
+	const row = [new ActionRowBuilder<ButtonBuilder>({components: [
 			new ButtonBuilder()
 				.setCustomId("Backward")
 				.setLabel(options.emojiList[0] ?? '⬅️')
 				.setStyle(2),
-		)
-		.addComponents(
 			new ButtonBuilder()
 				.setCustomId("Forward")
 				.setLabel(options.emojiList[1] ?? "➡️")
 				.setStyle(2),
-		)];
+		]})
+	];
 
 	if (pages.length > 1) {
 
 		const slides: BaseMessageOptions[] = pages.map((p, i) => {
 			if (Utils.isBaseMessageOptions(p)) {
 				if (p.embeds?.length) {
-					(p.embeds as (APIEmbed | JSONEncodable<APIEmbed>)[])[p.embeds.length - 1] = EmbedBuilder.from(p.embeds[p.embeds.length - 1]).setFooter(({text: formatFooter(options.footer, i + 1, pages.length)}))
+					(p.embeds as (EmbedBuilder | JSONEncodable<EmbedBuilder>)[])[p.embeds.length - 1] = EmbedBuilder.from(p.embeds[p.embeds.length - 1]).setFooter(({text: formatFooter(options.footer, i + 1, pages.length)}))
 				}
 				return p;
 			} else {
