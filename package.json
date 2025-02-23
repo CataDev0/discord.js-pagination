@@ -16,7 +16,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://gitlab.com/catadev/discord-js-pagination.git"
+		"url": "git+https://github.com/CataDev0/discord.js-pagination.git"
 	},
 	"author": "Cata <cata@cata.moe>",
 	"license": "MIT",
