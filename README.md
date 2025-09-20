@@ -15,7 +15,7 @@ This allows unique pagination of messages with only text on one page and multipl
 
 [discord.js](https://www.npmjs.com/package/discord.js) ^14.14.1 - Or newer
 
-## [Documentation](https://cataclym.github.io/discord.js-pagination/)
+## [Documentation](https://catadev0.github.io/discord.js-pagination/)
 ### Quick overview
 
 #### General Usage
