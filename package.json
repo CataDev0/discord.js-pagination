@@ -30,7 +30,7 @@
 		"docs": "typedoc && git add docs/*"
 	},
 	"dependencies": {
-		"discord.js": "^14.14.0 - ^14.16.3"
+		"discord.js": "^14.14.0 - ^14.25.1"
 	},
 	"devDependencies": {
 		"discord-api-types": "^0.37.112",
@@ -40,5 +40,8 @@
 		"typedoc-plugin-mdn-links": "^4.0.5",
 		"typedoc-plugin-missing-exports": "^3.1.0",
 		"typedoc-plugin-rename-defaults": "^0.7.2"
+	},
+	"overrides": {
+		"undici": "^6.23.0"
 	}
 }
