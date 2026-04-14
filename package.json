@@ -26,7 +26,7 @@
 		"registry": "https://registry.npmjs.org/"
 	},
 	"scripts": {
-		"prepublishOnly": "tsc",
+		"prepublishOnly": "tsc || npx -p typescript@~5.4.5 tsc",
 		"docs": "typedoc && git add docs/*"
 	},
 	"peerDependencies": {
