@@ -29,7 +29,7 @@
 		"prepublishOnly": "tsc",
 		"docs": "typedoc && git add docs/*"
 	},
-	"dependencies": {
+	"peerDependencies": {
 		"discord.js": "^14.14.0 - ^14.25.1"
 	},
 	"devDependencies": {
